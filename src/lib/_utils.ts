@@ -1,7 +1,7 @@
 /**
  * @param {{ moves: (arg0: { verbose: boolean; }) => any; }} chessObj
  */
-function validMovesAsDests(chessObj) {
+function validMovesAsDests(chessObj:any) {
 	const dests = new Map();
 	const moves = chessObj.moves({ verbose: true });
 
@@ -19,15 +19,12 @@ function validMovesAsDests(chessObj) {
 /**
  * @param {{ moves: () => any; }} chessObj
  */
-function randomMove(chessObj) {
+function randomMove(chessObj:any) {
 	const moves = chessObj.moves();
 	return moves[Math.floor(Math.random() * moves.length)];
 }
 
-/**
- * @param {{ turn: () => string; }} chess
- */
-function turnColor(chess) {
+function turnColor(chess:any) {
 	return chess.turn() === 'w' ? 'white' : 'black';
 }
 
