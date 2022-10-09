@@ -4,10 +4,9 @@
 	import { Chessground, cgStylesHelper } from "../lib/index"
 	import '$lib/cgstyles/chessground.css';
 	import { Chess } from 'chess.js';
-	import { randomMove, validMovesAsDests } from './_utils';
-	//import { Config, Api } from '../lib/index';
+	import {  turnColor, validMovesAsDests } from './_utils';
+
 	let chess = new Chess();
-	// console.log(chess.fen())
 	let isCheckmate = chess.isCheckmate()
 	let isDraw = chess.isDraw()
 	let Stalemate = chess.isStalemate()
@@ -19,44 +18,31 @@
 		orientation: 'white',
 		movable: {
 			color: 'white',
-			free: true,
-			events: {
-				after: handleMove
-			},
-		}
+			free: false,
+			dests:validMovesAsDests(chess)
+		},
 	};
 
-	/**
-	 * @param {any} from
-	 * @param {any} to
-	 * @param {any} metadata
-	 */
-	function handleMove(from, to, metadata) {
-
-		chess.move(`${from}${to}`, { sloppy: true });
-		console.log()
-		setTimeout(() => {
-			// @ts-ignore
-			let move = chess.move(randomMove(chess), { verbose: true });
-			// @ts-ignore
-			cgApi.move(move.from, move.to);
-			cgApi.state.turnColor = 'white';
-			cgApi.state.movable.dests = validMovesAsDests(chess);
-			cgApi.playPremove();
-			console.log('RobotMove')
-
-		}, 1500);
+	const playOtherSide = (orig,dest)=>{
+		chess.move({from:orig,to:dest});
+		cgApi.set({
+			turnColor:turnColor(chess),
+			movable :{
+				color:turnColor(chess),
+				dests:validMovesAsDests(chess)
+			}
+		});
 	}
 
 	/**
 	 * @param {{ state: any; move?: (arg0: string, arg1: string) => void; playPremove?: () => void; }} api
 	 */
 	function init(api) {
-
-		api.state.movable.dests = validMovesAsDests(chess);
 		// @ts-ignore
 		cgApi = api;
-		console.log(cgApi);
+		cgApi.set({
+			movable: {events:{after:playOtherSide}}
+		});
 	}
 </script>
 
