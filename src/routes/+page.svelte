@@ -5,7 +5,7 @@
 	import '$lib/cgstyles/chessground.css';
 	import { Chess } from 'chess.js';
 	import {  turnColor, validMovesAsDests } from './_utils';
-
+	
 	let chess = new Chess();
 	let isCheckmate = chess.isCheckmate()
 	let isDraw = chess.isDraw()
@@ -22,7 +22,6 @@
 			dests:validMovesAsDests(chess)
 		},
 	};
-
 
 	const playOtherSide = (orig,dest)=>{
 		console.table({color:turnColor(chess),orig,dest}); // added console.log for current move - remove before prod
@@ -47,6 +46,21 @@
 			movable: {events:{after:playOtherSide}}
 		});
 	}
+	function resetBoard(){
+		chess.reset(); // reset the chess for chess.js
+
+		// reset chessground - on screen chess board
+		cgApi.set({
+			fen:chess.fen(),
+			lastMove:[],
+			dests:validMovesAsDests(chess),
+			turnColor:turnColor(chess),
+			movable :{
+				color:turnColor(chess),
+				dests:validMovesAsDests(chess)
+			}
+		});
+	}
 </script>
 
 <div
@@ -58,21 +72,22 @@
 	}}
 	style="height: 640px; width: 640px;"
 />
+<button on:click={resetBoard}>Reset the game</button>
 {#if isCheckmate}
 	<div style='font-size: 30px'>
-		
+		Checkmate
 	</div>
 {/if}
 
 {#if isDraw}
 	<div style='font-size: 30px'>
-		
+		draw
 	</div>
 {/if}
 
 {#if Stalemate}
 	<div style='font-size: 30px'>
-		
+		stalemate
 	</div>
 {/if}
 <style>
