@@ -4,7 +4,7 @@
 	import { Chessground, cgStylesHelper } from "../lib/index"
 	import '$lib/cgstyles/chessground.css';
 	import { Chess } from 'chess.js';
-	import {  turnColor, validMovesAsDests,printChessBoard } from './_utils';
+	import {  turnColor, validMovesAsDests } from './_utils';
 
 	let chess = new Chess();
 	let isCheckmate = chess.isCheckmate()
