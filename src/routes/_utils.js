@@ -24,4 +24,11 @@ function randomMove(chessObj) {
 	return moves[Math.floor(Math.random() * moves.length)];
 }
 
-export { validMovesAsDests, randomMove };
+/**
+ * @param {{ turn: () => string; }} chess
+ */
+function turnColor(chess) {
+	return chess.turn() === 'w' ? 'white' : 'black';
+}
+
+export { validMovesAsDests, randomMove, turnColor };
