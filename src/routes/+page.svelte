@@ -4,7 +4,7 @@
 	import { Chessground, cgStylesHelper } from "../lib/index"
 	import '$lib/cgstyles/chessground.css';
 	import { Chess } from 'chess.js';
-	import {  turnColor, validMovesAsDests } from './_utils';
+	import {  turnColor, validMovesAsDests,printChessBoard } from './_utils';
 
 	let chess = new Chess();
 	let isCheckmate = chess.isCheckmate()
@@ -23,7 +23,9 @@
 		},
 	};
 
+
 	const playOtherSide = (orig,dest)=>{
+		console.table({color:turnColor(chess),orig,dest}); // added console.log for current move - remove before prod
 		chess.move({from:orig,to:dest});
 		cgApi.set({
 			turnColor:turnColor(chess),
