@@ -34,6 +34,7 @@
 				dests:validMovesAsDests(chess)
 			}
 		});
+		console.log(chess.ascii());
 	}
 
 	/**
