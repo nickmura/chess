@@ -45,7 +45,7 @@
 			cgApi.playPremove();
 			console.log('RobotMove')
 
-		}, 3000);
+		}, 1500);
 	}
 
 	/**
