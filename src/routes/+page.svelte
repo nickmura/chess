@@ -77,7 +77,8 @@
 		// updated working reset board function
 		function resetBoard(){
 		chess.reset(); // reset the chess for chess.js
-
+		// reset local storage 
+		localStorage.setItem('currentFEN',chess.fen());
 		// reset chessground - on screen chess board
 		cgApi.set({
 			fen:chess.fen(),
