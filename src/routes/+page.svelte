@@ -73,14 +73,24 @@
 			});
 
 		}
-
-		function resetBoard() { // resets the FEN string and deletes localStorage
-			currentState.set(initialBoardPosition)
-			localStorage.setItem('currentFEN', '')
-			chess = new Chess()
-			console.log(chess.ascii())
-			cgApi.set({ fen: initialBoardPosition })
-		}
+		
+		// updated working reset board function
+		function resetBoard(){
+		chess.reset(); // reset the chess for chess.js
+		// reset local storage 
+		localStorage.setItem('currentFEN',chess.fen());
+		// reset chessground - on screen chess board
+		cgApi.set({
+			fen:chess.fen(),
+			lastMove:[], // clear lastMove array to avoid issues related to turn
+			dests:validMovesAsDests(chess),
+			turnColor:turnColor(chess),
+			movable :{
+				color:turnColor(chess),
+				dests:validMovesAsDests(chess)
+			}
+		});
+	}
 	</script>
 	
 	<div
