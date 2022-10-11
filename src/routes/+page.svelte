@@ -6,15 +6,17 @@
 		import '$lib/cgstyles/chessground.css';
 		import { Chess } from 'chess.js';
 		import {  turnColor, validMovesAsDests } from '../lib/_utils';
-	
-		let chess = new Chess();
-		//console.log(chess.ascii())
-		let initialBoardPosition = chess.fen()
+		import { socket } from '../lib/client'
+
+
 		const currentState = writable('')
 		if (browser) {
 			currentState.set(localStorage.getItem('currentFEN') ?? '')
 		}
 
+		let chess = new Chess($currentState);
+		//console.log(chess.ascii())
+		let initialBoardPosition = chess.fen()
 		let isCheckmate
 		let isDraw
 		let Stalemate
@@ -27,9 +29,9 @@
 		let cgApi;
 		let config = {
 			fen: `${$currentState}`,
-			orientation: 'white',
+			orientation: 'black',
 			movable: {
-				color: 'white',
+				color: 'black',
 				free: false,
 				dests:validMovesAsDests(chess)
 			},
@@ -57,6 +59,8 @@
 			} else if (isCheckmate) {
 				localStorage.setItem('currentFEN', '')
 			}
+
+			currentState.set(localStorage.getItem('currentFEN'))
 			currentTurn = turnColor(chess)
 			winner = currentTurn === 'white' ? 'Player 2' : 'Player 1' 
 		}
@@ -65,12 +69,17 @@
 		 * @param {{ state: any; move?: (arg0: string, arg1: string) => void; playPremove?: () => void; }} api
 		 */
 		function init(api) {
+			console.log(turnColor(chess))
 			// @ts-ignore
 			cgApi = api;
 			cgApi.set({
 				fen: `${$currentState}`,
 				movable: {events:{after:playOtherSide}}
 			});
+			socket.on("connect", () => {
+			console.log(socket.id)
+			socket.emit('chess', $currentState)
+		})
 
 		}
 		
