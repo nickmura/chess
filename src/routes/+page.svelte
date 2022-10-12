@@ -5,7 +5,7 @@
 		import { Chessground, cgStylesHelper } from "../lib/index"
 		import '$lib/cgstyles/chessground.css';
 		import { Chess } from 'chess.js';
-		import {  turnColor, validMovesAsDests } from '../lib/_utils';
+		import { turnColor, validMovesAsDests } from '../lib/_utils';
 		import { socket } from '../lib/client'
 
 
@@ -26,14 +26,18 @@
 		/**
 		 * @type {{ move: (arg0: string, arg1: string) => void; state: { turnColor: string; movable: { dests: Map<any, any>; }; }; playPremove: () => void; }}
 		 */
+
+		socket.on('emitMove', (fenValue) => {
+			currentState.set(fenValue)
+		})
 		let cgApi;
-		let config = {
-			fen: `${$currentState}`,
-			orientation: 'black',
+		$: config = {
+			fen: $currentState,
+			orientation: 'white',
 			movable: {
-				color: 'black',
+				color: 'both',
 				free: false,
-				dests:validMovesAsDests(chess)
+				dests:validMovesAsDests(chess),
 			},
 		};
 	
@@ -60,8 +64,9 @@
 				localStorage.setItem('currentFEN', '')
 			}
 
-			currentState.set(localStorage.getItem('currentFEN'))
+			//currentState.set(localStorage.getItem('currentFEN'))
 			currentTurn = turnColor(chess)
+			socket.emit('chessMove', chess.fen())
 			winner = currentTurn === 'white' ? 'Player 2' : 'Player 1' 
 		}
 	
@@ -78,7 +83,7 @@
 			});
 			socket.on("connect", () => {
 			console.log(socket.id)
-			socket.emit('chess', $currentState)
+
 		})
 
 		}

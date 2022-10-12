@@ -7,8 +7,8 @@ const io = new Server({
 })
 
 io.on("connect", (socket) => {
-    socket.on('chess', (arg) => {
-        console.log(arg);
+    socket.on('chessMove', (fenValue) => {
+        io.emit('emitMove', fenValue)
     })
     console.log(socket.id)
 
