@@ -14,7 +14,10 @@
 			currentState.set(localStorage.getItem('currentFEN') ?? '')
 		}
 
-		let chess = new Chess($currentState);
+		let chess = new Chess();
+		$: {
+			chess = new Chess($currentState);
+		}
 		//console.log(chess.ascii())
 		let initialBoardPosition = chess.fen()
 		let isCheckmate
@@ -23,37 +26,42 @@
 		let currentTurn
 		let winner
 
-		/**
+		/** 
 		 * @type {{ move: (arg0: string, arg1: string) => void; state: { turnColor: string; movable: { dests: Map<any, any>; }; }; playPremove: () => void; }}
 		 */
 
 		socket.on('emitMove', (fenValue) => {
 			currentState.set(fenValue)
 		})
-		let cgApi;
+		//console.log(turnColor(chess))
+		let cgApi
 		$: config = {
 			fen: $currentState,
 			orientation: 'white',
 			movable: {
 				color: 'both',
 				free: false,
-				dests:validMovesAsDests(chess),
+				dests: validMovesAsDests(chess),
 			},
 		};
-	
+
+
+
+
 		const playOtherSide = (orig,dest)=> {
 			chess.move({from:orig,to:dest});
-			console.log(chess.fen())
-			console.log(chess.ascii())
+			console.log('turn color 1', turnColor(chess))
+			//console.log(chess.fen())
+			//console.log(chess.ascii())
+			console.log('turn color2', turnColor(chess))
 			cgApi.set({
 				turnColor:turnColor(chess),
 				movable :{
 					color:turnColor(chess),
-					dests:validMovesAsDests(chess)
+					
 				}
 			});
 
-			
 			isCheckmate = chess.isCheckmate()
         	isDraw = chess.isDraw()
         	Stalemate = chess.isStalemate()
@@ -65,28 +73,13 @@
 			}
 
 			//currentState.set(localStorage.getItem('currentFEN'))
+			console.log('turn color 1', turnColor(chess))
 			currentTurn = turnColor(chess)
 			socket.emit('chessMove', chess.fen())
 			winner = currentTurn === 'white' ? 'Player 2' : 'Player 1' 
-		}
+	}
 	
-		/**
-		 * @param {{ state: any; move?: (arg0: string, arg1: string) => void; playPremove?: () => void; }} api
-		 */
-		function init(api) {
-			console.log(turnColor(chess))
-			// @ts-ignore
-			cgApi = api;
-			cgApi.set({
-				fen: `${$currentState}`,
-				movable: {events:{after:playOtherSide}}
-			});
-			socket.on("connect", () => {
-			console.log(socket.id)
 
-		})
-
-		}
 		
 		// updated working reset board function
 		function resetBoard(){
@@ -105,6 +98,22 @@
 			}
 		});
 	}
+
+			/**
+		 * @param {{ state: any; move?: (arg0: string, arg1: string) => void; playPremove?: () => void; }} api
+		 */
+	function init(api) {
+		api.state.movable.dests = validMovesAsDests(chess);
+		// @ts-ignore
+		cgApi = api;
+		cgApi.set({
+			fen: `${$currentState}`,
+			movable: {events:{after:playOtherSide}}
+		});
+		socket.on("connect", () => {
+			console.log(socket.id)
+		})
+		}
 	</script>
 	
 	<div
