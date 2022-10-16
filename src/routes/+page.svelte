@@ -208,25 +208,25 @@
 	{/if}
 
 	{#each rooms as room}
-		{#if room.players < 2}
-		<div class="rooms">
-			<div class='gameID'>
-				ID: {room.gameID}
+
+			<div class="rooms">
+				<div class='gameID'>
+					ID: {room.gameID}
+				</div>
+				<div class='players'>
+					Players:  {room.players}
+				</div>
+				<div class='game'>
+					Game: {room.game}
+				</div>
+				<div class='stake'>
+					Stake: {room.stake}
+				</div>
+				<button on:click={(e)=>joinGame(room.gameID)} class='btn btn-primary'> 
+					Join Game
+				</button>
 			</div>
-			<div class='players'>
-				Players:  {room.players}
-			</div>
-			<div class='game'>
-				Game: {room.game}
-			</div>
-			<div class='stake'>
-				Stake: {room.stake}
-			</div>
-			<button on:click={(e)=>joinGame(room.gameID)} class='btn btn-primary'> 
-				Join Game
-			</button>
-		</div>
-		{/if}
+
 		<hr>
 	{/each}
 	<style>
