@@ -16,28 +16,30 @@
 
     // let rooms = []
     let currentRoom
-
-    onMount(() => {
-        currentRoom = sessionStorage.getItem('roomID')
-        function getFen() {
-            if (currentRoom) {
-            socket.emit('reconnectRoom', currentRoom)
-            }
-        }
-        getFen()
-    })
-
     let fen
     $: {
         fen
     }
-    
-    socket.on('fen', (fenValue) => {
+    onMount(() => {
+
+        
+        currentRoom = sessionStorage.getItem('roomID')
+        function getFen() {
+            if (currentRoom) {
+                socket.emit('reconnectRoom', currentRoom)
+            }
+        }
+
+
+        getFen()
+        socket.on('fen', (fenValue) => {
             fen = fenValue
             console.log(fenValue)
         })
-    currentState.set(fen)
 
+    })
+    $: currentState.set(fen)
+    console.log($currentState)
 
     let chess = new Chess();
     $: {
