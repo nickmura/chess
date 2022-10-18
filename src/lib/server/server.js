@@ -5,8 +5,6 @@ import { createClient } from 'redis';
 import express from 'express';
 import cors from 'cors';
 
-
-
 const app = express();
 app.use(express.urlencoded({ extended: true }))
 app.use(cors())
@@ -14,7 +12,7 @@ app.use(cors())
 var client = createClient();
 client.connect()
 .then(() => {
-    app.get('/rooms', async (req, res) => {
+    app.get('/rooms', async (req, res) => { // sends REDIS games through rest api
         client.get('ROOMS').then(rooms => {
             res.json(rooms)
         })
@@ -28,6 +26,8 @@ const io = new Server(3000, {
         origin: 'http://127.0.0.1:5173',
     }
 })
+
+
 
 /**
  * @type {any[]}
@@ -45,16 +45,19 @@ async function getRoomsOnStartup() {
     console.log(rooms)
 }
 getRoomsOnStartup()
-//client.setEx('ROOMS', JSON.stringify(rooms))
+
 
 io.on("connection", (socket) => {
-    //socket.emit('listRooms', client.get('ROOMS'))
+
 
     socket.on('chessMove', (gameId, fenValue) => {
+        socket.join(`${gameId}`)
+        console.log(gameId)
         io.to(`${gameId}`).emit('emitMove', fenValue) // emits the fen Value to the specific room
-        rooms.find(room => room.gameID === gameId).fen = fenValue
-        client.set('ROOMS', rooms)
-        io.to(`${gameId}`).emit('fen', client.get('ROOMS'))
+        rooms.find(room => room.gameID === parseInt(gameId)).fen = fenValue
+        let JSONrooms = JSON.stringify(rooms)
+        client.set('ROOMS', JSONrooms)
+
     })
 
     socket.on('createRoom', (uuid, room) => {
@@ -62,9 +65,11 @@ io.on("connection", (socket) => {
         rooms.push(room)
         console.log(rooms)
         let JSONrooms = JSON.stringify(rooms)
+        
         io.to(`${uuid}`).emit('emitRoom', uuid)
-        //socket.emit('listRooms', rooms) --> Currently not used in favor of the REDIS + REST API.
+
         client.set('ROOMS', JSONrooms)
+        //socket.emit('listRooms', rooms) --> Currently not used in favor of the REDIS + REST API.
     })
 
     socket.on('joinRoom', (player2, gameId) => {
@@ -77,7 +82,10 @@ io.on("connection", (socket) => {
 
     socket.on('reconnectRoom', (gameId) => {
         socket.join(`${gameId}`)
-        socket.emit('fen', client.get('ROOMS'))
+        console.log('reconnectRoom', gameId)
+        socket.join(`${gameId}`)
+        console.log(rooms.find(room => room.gameID === parseInt(gameId)).fen)
+        socket.to(`${gameId}`).emit('fen', rooms.find(room => room.gameID === parseInt(gameId)).fen)
     })
 
     console.log(socket.id)
@@ -87,6 +95,3 @@ io.on("connection", (socket) => {
 console.log('listening on port 3000, express on 5001')
 
 
-    // socket.on('move-piece', message => {
-    //     console.log(message)
-    // })
