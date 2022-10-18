@@ -55,8 +55,10 @@ io.on("connection", (socket) => {
         console.log(gameId)
         io.to(`${gameId}`).emit('emitMove', fenValue) // emits the fen Value to the specific room
         rooms.find(room => room.gameID === parseInt(gameId)).fen = fenValue
+        console.log(rooms.find(room => room.gameID === parseInt(gameId)))
         let JSONrooms = JSON.stringify(rooms)
         client.set('ROOMS', JSONrooms)
+
 
     })
 
@@ -81,11 +83,12 @@ io.on("connection", (socket) => {
     })
 
     socket.on('reconnectRoom', (gameId) => {
+        getRoomsOnStartup()
         socket.join(`${gameId}`)
         console.log('reconnectRoom', gameId)
         socket.join(`${gameId}`)
         console.log(rooms.find(room => room.gameID === parseInt(gameId)).fen)
-        socket.to(`${gameId}`).emit('fen', rooms.find(room => room.gameID === parseInt(gameId)).fen)
+        io.to(`${gameId}`).emit('fen', rooms.find(room => room.gameID === parseInt(gameId)).fen)
     })
 
     console.log(socket.id)

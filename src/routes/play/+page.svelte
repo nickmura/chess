@@ -10,7 +10,7 @@
     import { callValue } from '$lib/client'
     import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-
+    
     const currentState = writable('')
     const socket = io("http://localhost:3000")
 
@@ -29,17 +29,10 @@
                 socket.emit('reconnectRoom', currentRoom)
             }
         }
-
-
         getFen()
-        socket.on('fen', (fenValue) => {
-            fen = fenValue
-            console.log(fenValue)
-        })
 
     })
-    $: currentState.set(fen)
-    console.log($currentState)
+
 
     let chess = new Chess();
     $: {
@@ -130,7 +123,16 @@
     function init(api) {
         api.state.movable.dests = validMovesAsDests(chess);
         // @ts-ignore
-        //console.log(chess.fen())
+        socket.on('fen', (fenValue) => {
+            fen = fenValue
+            console.log(fenValue)
+            currentState.set(fen)
+        })
+
+
+
+        //console.log(fen)
+        //currentState.set(fen)
         cgApi = api;
         cgApi.set({
             fen:$currentState,
@@ -164,7 +166,7 @@
 {#if hasJoinedMsg}
     {hasJoinedMsg}
 {/if}
-<button on:click={resetBoard} class='btn btn-primary'>Reset Board</button>
+<button on:click={resetBoard} class='btn btn-primary' disabled>Reset Board</button>
 
 
 {#if isCheckmate}
