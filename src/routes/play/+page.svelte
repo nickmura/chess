@@ -7,6 +7,7 @@
     import { Chess } from 'chess.js';
     import { turnColor, validMovesAsDests } from '$lib/_utils';
     import { io } from 'socket.io-client'
+    import { callValue } from '$lib/client'
     import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
     
@@ -15,27 +16,17 @@
 
     
     let currentRoom
-    let currentGamePlayers
-    const sessionCheckmate = writable('')
-
-
-    let getCheckmate
-    console.log()
     let fen
-    $: fen
-    
-
-    if (browser) {
-        currentRoom = sessionStorage.getItem('roomID')
+    $: {
+        fen
     }
     onMount(() => {
-        currentRoom = sessionStorage.getItem('roomID')
-        sessionCheckmate.set(sessionStorage.getItem('sessionCheckmate'))
+
         
+        currentRoom = sessionStorage.getItem('roomID')
         function getFen() {
             if (currentRoom) {
                 socket.emit('reconnectRoom', currentRoom)
-                socket.emit('getPlayers', currentRoom)
             }
         }
         getFen()
@@ -47,31 +38,12 @@
     $: {
         chess = new Chess($currentState);
     }
+    
 
 
-
-    socket.on('resPlayers', (players) => {
-        currentGamePlayers = players
-    })
-
-    socket.on('getCheckmate', (checkObject) => {
-        //getCheckmate = {isCheckmate:checkObject.isCheckmate, winner: checkObject.winner}
-        sessionStorage.setItem('sessionCheckmate', `${checkObject.winner} wins by checkmate!`)
-        sessionCheckmate.set(sessionStorage.getItem('sessionCheckmate'))
-    })
-
-    socket.on('getStalemate', (checkObject) => {
-        sessionStorage.setItem('sessionCheckmate', `The game is a stalemate!`)
-        sessionCheckmate.set(sessionStorage.getItem('sessionCheckmate'))
-    })
-    socket.on('getDraw', (checkObject) => {
-        sessionStorage.setItem('sessionCheckmate', `The game is a draw!`)
-        sessionCheckmate.set(sessionStorage.getItem('sessionCheckmate'))
-    })
     function gotoAvailable() {
         goto('../')
     }
-
 
 
     socket.on('emitMove', (fenValue) => {
@@ -107,6 +79,7 @@
 
     const playOtherSide = (orig,dest)=> {
         chess.move({from:orig,to:dest});
+
         cgApi.set({
             turnColor:turnColor(chess),
             movable :{
@@ -121,15 +94,7 @@
         currentTurn = turnColor(chess)
 
         socket.emit('chessMove', currentRoom, chess.fen()) /** Emits that a client has made a move to the other room */
-        winner = currentTurn === 'white' ? 'Player 2' : 'Player 1';
-        if (isCheckmate) {
-            socket.emit('isCheckmate', currentRoom, winner)
-        } if (Stalemate && isDraw) {
-            socket.emit('isStalemate', currentRoom)
-        } else if (isDraw && !Stalemate) {
-            socket.emit('isDraw', currentRoom)
-        }
-         
+        winner = currentTurn === 'white' ? 'Player 2' : 'Player 1' 
 }
 
 
@@ -158,12 +123,13 @@
     function init(api) {
         api.state.movable.dests = validMovesAsDests(chess);
         // @ts-ignore
-
         socket.on('fen', (fenValue) => {
             fen = fenValue
             console.log(fenValue)
             currentState.set(fen)
         })
+
+
 
         //console.log(fen)
         //currentState.set(fen)
@@ -180,16 +146,7 @@
             }
         });
 }
-
-function leaveGame() {
-    socket.emit('deleteRoom', currentRoom, 'checkmate/draw')
-    goto('../')
-    sessionStorage.setItem('sessionCheckmate', '')
-    sessionStorage.setItem('roomID', '')
-    currentState.set('')
-}
 </script>
-
 
 <div
     use:Chessground={{ config, initializer: init }}
@@ -209,33 +166,24 @@ function leaveGame() {
 {#if hasJoinedMsg}
     {hasJoinedMsg}
 {/if}
-{#if $sessionCheckmate}
-<button on:click={leaveGame} class='btn btn-primary'>Leave Game</button>
-{:else}
-<button on:click={leaveGame} class='btn btn-primary' disabled>Leave Game</button>
-{/if}
 <button on:click={resetBoard} class='btn btn-primary' disabled>Reset Board</button>
 
-{#if currentGamePlayers}
-<div style='font-size: 30px'>
-    Current Players: {currentGamePlayers}
-</div>
-{/if}
-{#if $sessionCheckmate.includes('checkmate')}
+
+{#if isCheckmate}
     <div style='font-size: 30px'>
-        {$sessionCheckmate}
+        {winner} wins by Checkmate!
     </div>
 {/if}
 
-{#if $sessionCheckmate.includes('stalemate')}
+{#if isDraw}
     <div style='font-size: 30px'>
-        The game is a stalemate!
+        Draw!
     </div>
 {/if}
 
-{#if $sessionCheckmate.includes('draw')}
+{#if Stalemate}
     <div style='font-size: 30px'>
-        The game is a draw!
+        Stalemate!
     </div>
 {/if}
 
