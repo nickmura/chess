@@ -13,7 +13,7 @@
     const currentState = writable('')
     const socket = io("http://localhost:3000")
 
-    // let rooms = []
+    
     let currentRoom
     let currentGamePlayers
     const sessionCheckmate = writable('')
@@ -158,7 +158,7 @@
     function init(api) {
         api.state.movable.dests = validMovesAsDests(chess);
         // @ts-ignore
-        
+
         socket.on('fen', (fenValue) => {
             fen = fenValue
             console.log(fenValue)
