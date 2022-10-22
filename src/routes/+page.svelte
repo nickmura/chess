@@ -6,7 +6,7 @@
 		import { io } from 'socket.io-client';
 		import { goto } from '$app/navigation';
 
-		import Auth from '../lib/Auth.svelte';
+		import Auth from '../lib/Auth.svelte' //Not really important right now
 		const socket = io("http://localhost:3000")
 
 		let counter=0
@@ -66,6 +66,7 @@
 	<button type='button' class='btn btn-primary disabled' disabled>Create Room</button>
 	{/if}
 
+	
 	{#each rooms as room}
 		{#if room.players.length < 2}
 

@@ -135,20 +135,20 @@
 
     // updated working reset board function
     function resetBoard(){
-    chess.reset();
-    // console.log(chess.fen())
-    currentState.set(chess.fen())
-    cgApi.set({
-        fen:$currentState,
-        lastMove:[], // clear lastMove array to avoid issues related to turn
-        dests:validMovesAsDests(chess),
-        turnColor:turnColor(chess),
-        movable :{
-            color:turnColor(chess),
+        chess.reset();
+        // console.log(chess.fen())
+        currentState.set(chess.fen())
+        cgApi.set({
+            fen:$currentState,
+            lastMove:[], // clear lastMove array to avoid issues related to turn
             dests:validMovesAsDests(chess),
-            //events:{after:playOtherSide}
-        }
-    });
+            turnColor:turnColor(chess),
+            movable :{
+                color:turnColor(chess),
+                dests:validMovesAsDests(chess),
+                //events:{after:playOtherSide}
+            }
+        });
 }
 
         /**
@@ -158,8 +158,7 @@
     function init(api) {
         api.state.movable.dests = validMovesAsDests(chess);
         // @ts-ignore
-
-
+        
         socket.on('fen', (fenValue) => {
             fen = fenValue
             console.log(fenValue)
