@@ -22,41 +22,41 @@ client.connect()
         })
     })
 
-    app.post('/address', (req, res) => {
-        let address = req.body
-        // 
-        let insert = `insert into usernames("address") values($1)`
-        const values = [address[0].address]
-        post.query(insert, values, (err, result) => {
-            if (!err) console.log('Insertion was successful')
-            if (err.code == '23505') console.log('User gave Duplicate value')
-            else { console.log(err) }
+//     app.post('/address', (req, res) => { <--- This REST API 
+//         let address = req.body
+//         // 
+//         let insert = `insert into usernames("address") values($1)`
+//         const values = [address[0].address]
+//         post.query(insert, values, (err, result) => {
+//             if (!err) console.log('Insertion was successful')
+//             if (err.code == '23505') console.log('User gave Duplicate value')
+//             else { console.log(err) }
             
-        })
+//         })
         
-        //res.json({message: ''})
-    })
-    app.post('/username', (req, res) => {
-        let user = req.body
-        console.log(user)
+//         res.json({message: ''})
+//     })
+//     app.post('/username', (req, res) => {
+//         let user = req.body
+//         console.log(user)
         
-        let insert = `UPDATE usernames SET username = ($1) WHERE address = ($2)`;
-        const values = [`${user.username}`, `${user.address}`]
+//         let insert = `UPDATE usernames SET username = ($1) WHERE address = ($2)`;
+//         const values = [`${user.username}`, `${user.address}`]
        
-        post.query(insert, values, (err, result) => {
-            if (!err) console.log('Insertion was successful')
-            //if (err.code == '23505') console.log('User gave Duplicate value')
-            else if (err) console.log(err)
+//         post.query(insert, values, (err, result) => {
+//             if (!err) console.log('Insertion was successful')
+//             //if (err.code == '23505') console.log('User gave Duplicate value')
+//             else if (err) console.log(err)
             
-        })
+//         })
         
-        //res.json({message: ''})
-    })
+//         //res.json({message: ''})
+//     })
 
-    app.get('/address', (req, res) => {
-        console.log(res.body)
-        res.json({message: 'Recieved'})
-    })
+//     app.get('/address', (req, res) => {
+//         console.log(res.body)
+//         res.json({message: 'Recieved'})
+//     })
 })
 
 

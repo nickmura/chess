@@ -55,7 +55,6 @@
 		}
 	</script>
 
-	<Auth></Auth>
 	{#if currentRoom}
 	<div style='font-size: 3rem;'>It seems you have a room already. Click<button class='btn btnlink' 
 		style='font-size: 3rem;'><u style='color: blue;' on:click={gotoGameRoom}>here</u></button> to go your game!</div>
