@@ -1,60 +1,38 @@
-A wrapper around https://github.com/ornicar/chessground that allows it to be used with svelte through `use:`
+# create-svelte
 
-## Usage
+Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
 
-The package has two named exports, `Chessground` and `cgStylesHelper` along with css files to change how the board looks.
+## Creating a project
 
-If you decide to use the stylesheets provided by the package, the chessboard will be 100% width and height of the parent. The following css variables are available for basic customisation.
+If you're seeing this, you've probably already done this step. Congrats!
 
-|        Variable        |                                                                          Purpose                                                                           | Type                                                                        |
-| :--------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------: | --------------------------------------------------------------------------- |
-|     --cg-url-board     |                                                            Sets the image to use as the board.                                                             | \<url>                                                                      |
-| --cg-url-\[pieceName\] | Sets the image to use as the representation for each piece. pieceName is one of `['wK', 'wQ', 'wR', 'wB', 'wN', 'wP', 'bK', 'bQ', 'bR', 'bB', 'bN', 'bP']` | \<url>                                                                      |
-|        --cg-ccw        |                                                                   Color of white coords                                                                    | \<color>                                                                    |
-|        --cg-ccb        |                                                                   Color of black coords                                                                    | \<color>                                                                    |
-|        --cg-cs         |                                                                    Coords text shadow.                                                                     | [Text shadow](https://developer.mozilla.org/en-US/docs/Web/CSS/text-shadow) |
+```bash
+# create a new project in the current directory
+npm create svelte@latest
 
-The first two can be set manually or you can use the cgStylesHelper action to set them.
-
-```html
-<script>
-	import { Chessground, cgStylesHelper } from 'svelte-use-chessground';
-	import 'svelte-use-chessground/cgstyles/chessground.css';
-
-	let cgApi;
-	let config = {};
-
-	function initializer(api) {
-		cgApi = api;
-		// A named function might not be necessary but I've encountered infinite loops while using an inline initializer function.
-	}
-</script>
-
-<div
-	use:Chessground="{{config, initializer}}"
-	use:cgStylesHelper="{{ piecesFolderUrl: '/images/pieces/merida', boardUrl: '/images/board/blue.svg' }}"
-/>
+# create a new project in my-app
+npm create svelte@latest my-app
 ```
-
-### SvelteKit
-
-When using with svelte-kit, adding chessground to `vite.ssr.noExternal` might be a good idea.
-
-Demo here: https://svelte-use-chessground.netlify.app
 
 ## Developing
 
-Once you've created a project and installed dependencies with `pnpm install`.
+Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
 
 ```bash
-pnpm run dev
+npm run dev
 
 # or start the server and open the app in a new browser tab
-pnpm run dev -- --open
+npm run dev -- --open
 ```
 
-## Packaging
+## Building
+
+To create a production version of your app:
 
 ```bash
-pnpm run package
+npm run build
 ```
+
+You can preview the production build with `npm run preview`.
+
+> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
